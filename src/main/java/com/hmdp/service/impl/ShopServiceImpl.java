@@ -5,6 +5,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hmdp.dto.Result;
 import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
@@ -12,16 +13,24 @@ import com.hmdp.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.utils.CacheClient;
 import com.hmdp.utils.RedisData;
+import com.hmdp.utils.SystemConstants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.geo.Distance;
+import org.springframework.data.geo.GeoResult;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.hmdp.utils.RedisConstants.*;
 
@@ -269,5 +278,68 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         // 再删除缓存
         stringRedisTemplate.delete(CACHE_SHOP_KEY + id);
         return Result.ok();
+    }
+
+    @Override
+    public Result queryShopByType(Integer typeId, Integer current, Double x, Double y) {
+        // 判断是否是根据距离查询
+        if (x == null || y == null) {
+            // 根据类型分页查询
+            Page<Shop> page = query()
+                    .eq("type_id", typeId)
+                    .page(new Page<>(current, SystemConstants.DEFAULT_PAGE_SIZE));
+            // 返回数据
+            return Result.ok(page.getRecords());
+        }
+
+        // 是根据距离查询
+        // 逻辑分页
+        int from = (current - 1) * SystemConstants.DEFAULT_PAGE_SIZE;
+        int end = current * SystemConstants.DEFAULT_PAGE_SIZE;
+
+        // 查询geo
+        String key = SHOP_GEO_KEY + typeId;
+        // 查询 redis
+        // geosearch key bylonlat x y byradius 10 withdistance
+        GeoResults<RedisGeoCommands.GeoLocation<String>> results = stringRedisTemplate.opsForGeo()
+                .search(
+                        key,
+                        GeoReference.fromCoordinate(x, y),
+                        new Distance(5000),
+                        RedisGeoCommands.GeoSearchCommandArgs.newGeoSearchArgs()
+                                .includeDistance()
+                                .limit(end)
+                );
+
+        if (results == null) {
+            return Result.ok(Collections.emptyList());
+        }
+
+        List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = results.getContent();
+        if (list.size() <= from) {
+            return Result.ok(Collections.emptyList());
+        }
+
+        // 跳过from 条，因为redis 只能查出个数
+        // 收集shop id，距离
+        List<Long> ids = new ArrayList<>(list.size());
+        Map<String, Double> distanceMap = new HashMap<>(list.size());
+        list.stream().skip(from).forEach(result -> {
+            RedisGeoCommands.GeoLocation<String> content = result.getContent();
+            Distance distance = result.getDistance();
+            String idStr = content.getName();
+            ids.add(Long.valueOf(idStr));
+            distanceMap.put(idStr, distance.getValue());
+        });
+
+        // 根据 id 到数据库查询商铺的信息
+        List<Shop> shops = listByIds(ids);
+        Map<Long, Shop> shopMap = shops.stream().collect(Collectors.toMap(Shop::getId, shop -> shop));
+        List<Shop> shopList = ids.stream().map(shopMap::get).collect(Collectors.toList());
+        for (Shop shop : shopList) {
+            shop.setDistance(distanceMap.get(shop.getId().toString()));
+        }
+
+        return Result.ok(shopList);
     }
 }

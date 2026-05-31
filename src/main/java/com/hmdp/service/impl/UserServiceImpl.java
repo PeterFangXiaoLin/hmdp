@@ -13,14 +13,20 @@ import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.RedisConstants;
 import com.hmdp.utils.RegexUtils;
+import com.hmdp.utils.UserHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpSession;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -110,6 +116,62 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 返回token
         return Result.ok(token);
+    }
+
+    @Override
+    public Result sign() {
+        // 获取当前登录用户id
+        Long userId = UserHolder.getUser().getId();
+        // 获取今天日期
+        LocalDateTime now = LocalDateTime.now();
+        // 构造key
+        String keySuffix = now.format(DateTimeFormatter.ofPattern(":yyyyMM"));
+        String key = USER_SIGN_KEY + userId + keySuffix;
+
+        // 获取今天是这个月的第几天
+        int dayOfMonth = now.getDayOfMonth();
+
+        // 设置签到
+        stringRedisTemplate.opsForValue().setBit(key, dayOfMonth - 1, true);
+        return Result.ok();
+    }
+
+    @Override
+    public Result signCount() {
+        // 获取当前登录用户id
+        Long userId = UserHolder.getUser().getId();
+        // 获取当前日期
+        LocalDateTime now = LocalDateTime.now();
+        // 构造key
+        String keySuffix = now.format(DateTimeFormatter.ofPattern(":yyyyMM"));
+        String key = USER_SIGN_KEY + userId + keySuffix;
+        // 获取当前是这个月的第几天
+        int dayOfMonth = now.getDayOfMonth();
+
+        // 查询这个月的签到情况 BITFIELD sign:1010:202605 GET u31 0
+        List<Long> result = stringRedisTemplate.opsForValue().bitField(
+                key,
+                BitFieldSubCommands.create()
+                        .get(BitFieldSubCommands.BitFieldType.unsigned(dayOfMonth))
+                        .valueAt(0L)
+        );
+        // 校验结果
+        if (CollectionUtils.isEmpty(result)) {
+            return Result.ok(0);
+        }
+
+        Long num = result.get(0);
+        if (num == null || num == 0) {
+            return Result.ok(0);
+        }
+
+        // 统计从当前天开始往前遍历的连续签到次数
+        int count = 0;
+        while ((num & 1) != 0) {
+            count++;
+            num >>>= 1;
+        }
+        return Result.ok(count);
     }
 
     private User createNewUserByPhone(String phone) {

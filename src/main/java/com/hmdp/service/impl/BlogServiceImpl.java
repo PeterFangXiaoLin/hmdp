@@ -5,17 +5,21 @@ import cn.hutool.core.util.BooleanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import cn.hutool.core.util.StrUtil;
 import com.hmdp.dto.Result;
+import com.hmdp.dto.ScrollResult;
 import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.Blog;
+import com.hmdp.entity.Follow;
 import com.hmdp.entity.User;
 import com.hmdp.mapper.BlogMapper;
 import com.hmdp.service.IBlogService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmdp.service.IFollowService;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.RedisConstants;
 import com.hmdp.utils.SystemConstants;
 import com.hmdp.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -36,6 +40,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
 
     @Resource
     private IUserService userService;
+
+    @Resource
+    private IFollowService followService;
     
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -145,5 +152,79 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
                 .map(user -> BeanUtil.copyProperties(user, UserDTO.class))
                 .collect(Collectors.toList());
         return Result.ok(userDTOS);
+    }
+
+    @Override
+    public Result saveBlog(Blog blog) {
+        // 获取登录用户
+        UserDTO user = UserHolder.getUser();
+        blog.setUserId(user.getId());
+        // 保存探店博文
+        boolean isSuccess = save(blog);
+        if (!isSuccess) {
+            return Result.fail("新增笔记失败！");
+        }
+        // 推送到粉丝的收件箱
+        // 查询粉丝列表
+        List<Follow> followList = followService.lambdaQuery()
+                .eq(Follow::getFollowUserId, user.getId())
+                .list();
+        for (Follow follow : followList) {
+            // 粉丝id
+            Long userId = follow.getUserId();
+            String key = RedisConstants.FEED_KEY + userId;
+            // 推送
+            stringRedisTemplate.opsForZSet().add(key, blog.getId().toString(), System.currentTimeMillis());
+        }
+        // 返回id
+        return Result.ok(blog.getId());
+    }
+
+    @Override
+    public Result queryBlogOfFollow(Long max, Integer offset) {
+        // 获取当前登录用户的推送箱
+        Long userId = UserHolder.getUser().getId();
+        String key = RedisConstants.FEED_KEY + userId;
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = stringRedisTemplate.opsForZSet()
+                .reverseRangeByScoreWithScores(key, 0, max, offset, 2);
+        if (CollectionUtils.isEmpty(typedTuples)) {
+            return Result.ok();
+        }
+
+        // 解析出里面blog
+        List<Long> ids = new ArrayList<>(typedTuples.size());
+        long minTime = 0;
+        int minTimeCount = 1;
+        for (ZSetOperations.TypedTuple<String> typedTuple : typedTuples) {
+            String idStr = typedTuple.getValue();
+            if (StrUtil.isBlank(idStr)) {
+                continue;
+            }
+            ids.add(Long.valueOf(idStr));
+            long time = typedTuple.getScore().longValue();
+            if (time == minTime) {
+                minTimeCount++;
+            } else {
+                minTime = time;
+                minTimeCount = 1;
+            }
+        }
+
+        // 根据blog ids 查找blog, 注意in 查找返回是无序的
+        List<Blog> blogList = listByIds(ids);
+        Map<Long, Blog> blogMap = blogList.stream().collect(Collectors.toMap(Blog::getId, blog -> blog));
+        List<Blog> blogs = ids.stream().map(blogMap::get).collect(Collectors.toList());
+        for (Blog blog : blogs) {
+            queryBlogUser(blog);
+            isBlogLiked(blog);
+        }
+
+        // 封装返回结果
+        ScrollResult result = new ScrollResult();
+        result.setList(blogs);
+        result.setMinTime(minTime);
+        result.setOffset(minTimeCount);
+
+        return Result.ok(result);
     }
 }
