@@ -81,13 +81,13 @@
 
 ### 缓存更新策略
 
-![image-20260413195648895](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413195648895.png)
+![image-20260413195648895](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111131554.png)
 
-![image-20260413200008213](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413200008213.png)
+![image-20260413200008213](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111149871.png)
 
-![image-20260413200248523](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413200248523.png)
+![image-20260413200248523](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111218717.png)
 
-![image-20260413201707243](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413201707243.png)
+![image-20260413201707243](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111236008.png)
 
 ```
 1. 靠redis 内存不足淘汰
@@ -118,7 +118,7 @@
 2. 布隆过滤器
 ```
 
-![image-20260413202758842](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413202758842.png)
+![image-20260413202758842](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111250039.png)
 
 
 
@@ -128,19 +128,15 @@
 大量key同时过期
 ```
 
-
-
-
-
-![image-20260413203836065](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413203836065.png)
+![image-20260413203836065](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111305369.png)
 
 
 
 ### 缓存击穿
 
-![image-20260413204444006](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413204444006.png)
+![image-20260413204444006](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111319097.png)
 
-![image-20260413205849780](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260413205849780.png)
+![image-20260413205849780](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111332347.png)
 
 
 
@@ -155,13 +151,13 @@
 
 ### 封装 Redis 工具
 
-![image-20260425151338957](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260425151338957.png)
+![image-20260425151338957](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111344212.png)
 
 
 
 ### Redis 全局ID生成器
 
-![image-20260426155502673](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260426155502673.png)
+![image-20260426155502673](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111356035.png)
 
 
 
@@ -171,7 +167,7 @@
 
 ### 优惠券下单
 
-![image-20260501161056017](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260501161056017.png)
+![image-20260501161056017](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111407591.png)
 
 ```
 1. 校验参数
@@ -185,17 +181,15 @@
 
 ### 超卖问题
 
-![image-20260501164352706](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260501164352706.png)
+![image-20260501164352706](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111419519.png)
 
 
 
 增加版本号和 CAS
 
-![image-20260501164509827](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260501164509827.png)
+![image-20260501164509827](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111430649.png)
 
-
-
-![image-20260501165620878](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260501165620878.png)
+![image-20260501165620878](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111447954.png)
 
 
 
@@ -213,11 +207,11 @@
 
 ### 集群模式下处理
 
-![image-20260501232724665](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260501232724665.png)
+![image-20260501232724665](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111505695.png)
 
 #### 基于 Redis 实现
 
-![image-20260501233248222](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260501233248222.png)
+![image-20260501233248222](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111515069.png)
 
 
 
@@ -231,11 +225,9 @@
 
 同时，释放锁，这一段需要封装成一个原子操作，要么全部成功，要么全部失败。
 
-![image-20260502073014783](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260502073014783.png)
+![image-20260502073014783](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111527332.png)
 
-
-
-![image-20260502081254982](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260502081254982.png)
+![image-20260502081254982](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111539400.png)
 
 
 
@@ -243,7 +235,7 @@
 
 修改 为使用 Redisson 版本
 
-![image-20260502170429557](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260502170429557.png)
+![image-20260502170429557](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111553947.png)
 
 
 
@@ -251,7 +243,7 @@
 
 主从一致解决
 
-![image-20260502174700775](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260502174700775.png)
+![image-20260502174700775](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111608251.png)
 
 
 
@@ -261,7 +253,7 @@
 
 ### 秒杀优化
 
-![image-20260502185806238](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260502185806238.png)
+![image-20260502185806238](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111619387.png)
 
 
 
@@ -280,7 +272,7 @@ ArrayBlockingQueue
 
 ### 使用 Redis  stream 数据结构当简单的消息队列
 
-![image-20260517151609573](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260517151609573.png)
+![image-20260517151609573](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111632139.png)
 
 ### 发布探店笔记
 
@@ -296,7 +288,7 @@ ArrayBlockingQueue
 
 ### 点赞实现
 
-![image-20260528213219198](C:\Users\hello\AppData\Roaming\Typora\typora-user-images\image-20260528213219198.png)
+![image-20260528213219198](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530111642795.png)
 
 ### 点赞排行榜
 
@@ -308,4 +300,57 @@ ArrayBlockingQueue
 
 1. 未登录用户获取点赞详情会报错，需要修改
 2. sql in 查询不会根据 in 填入的 内容顺序进行返回，需要加一个排序
+
+### 关注和取关
+
+保存数据到中间表
+
+### 共同关注
+
+关注后，额外保存一份数据到 set 集合中，两个集合求交集
+
+### Feed流推送
+
+![image-20260530163428666](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530163432488.png)
+
+![image-20260530163631094](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530163632980.png)
+
+![image-20260530163756513](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530163758550.png)
+
+![image-20260530164032126](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530164033676.png)
+
+![image-20260530164206970](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530164208622.png)
+
+### 用推模式实现关注推送
+
+![image-20260530164534176](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530164537588.png)
+
+![image-20260530164700179](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530164701480.png)
+
+![image-20260530164918231](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260530164919441.png)
+
+1. 添加笔记时，查询该用户的粉丝，向给用户的每个粉丝的推送箱发送笔记id
+2. 查询时，获取当前登录用户的id，获取该用户的推送箱，根据上一次的时间戳，以及偏移量，求本次需要查询的笔记，如果是第一次，偏移量为0，时间戳为当前时间戳。
+
+
+
+### 附近商铺搜索
+
+![image-20260531202213586](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260531202222999.png)
+
+### 用户签到
+
+![image-20260531220705590](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260531220708179.png)
+
+![image-20260531221302889](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260531221304290.png)
+
+### 签到统计
+
+![image-20260531223123062](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260531223125235.png)
+
+### UV统计
+
+![image-20260531232851001](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260531232852537.png)
+
+![image-20260531233036053](https://raw.githubusercontent.com/PeterFangXiaoLin/imgs/main/test/20260531233037315.png)
 
